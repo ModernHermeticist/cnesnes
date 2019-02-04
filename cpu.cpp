@@ -128,7 +128,7 @@ void CPU::leftNib0(uint8_t rightNib)
 				carryFlag = 1;
 			else
 				carryFlag = 0;
-			if (memory[firstByteOfInterest] & 0b10000000 == 0b10000000)
+			if ((memory[firstByteOfInterest] & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -151,7 +151,7 @@ void CPU::leftNib0(uint8_t rightNib)
 				carryFlag = 1;
 			else
 				carryFlag = 0;
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -209,7 +209,7 @@ void CPU::leftNib1(uint8_t rightNib)
 				carryFlag = 1;
 			else
 				carryFlag = 0;
-			if (memory[tmpAddress] & 0b10000000 == 0b10000000)
+			if ((memory[tmpAddress] & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -245,7 +245,7 @@ void CPU::leftNib1(uint8_t rightNib)
 				carryFlag = 1;
 			else
 				carryFlag = 0;
-			if (memory[tmpAddress] & 0b10000000 == 0b10000000)
+			if ((memory[tmpAddress] & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -270,10 +270,10 @@ void CPU::leftNib2(uint8_t rightNib)
 			x += firstByteOfInterest;
 			if (x > 0xFF)
 			{
-				x -= 0x100;
+				x -= (uint8_t)0x100;
 			}
 			a &= memory[x];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = true;
 			else
 				negativeFlag = false;
@@ -292,7 +292,7 @@ void CPU::leftNib2(uint8_t rightNib)
 		case 0x5: // AND_ZERO_PAGE
 		{
 			a &= memory[firstByteOfInterest];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = true;
 			else
 				negativeFlag = false;
@@ -308,7 +308,7 @@ void CPU::leftNib2(uint8_t rightNib)
 		case 0x9: // AND_IMMEDIATE
 		{
 			a &= firstByteOfInterest;
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = true;
 			else
 				negativeFlag = false;
@@ -328,7 +328,7 @@ void CPU::leftNib2(uint8_t rightNib)
 			tmp <<= 8;
 			tmp |= firstByteOfInterest;
 			a &= memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = true;
 			else
 				negativeFlag = false;
@@ -359,7 +359,7 @@ void CPU::leftNib3(uint8_t rightNib)
 		{
 			y += memory[firstByteOfInterest];
 			a &= y;
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -377,7 +377,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			uint8_t tmp = (x + firstByteOfInterest);
 
 			a &= memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -402,7 +402,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			tmp |= firstByteOfInterest;
 			tmp += y;
 			a &= memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -423,7 +423,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			tmp |= firstByteOfInterest;
 			tmp += x;
 			a &= memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -451,7 +451,7 @@ void CPU::leftNib4(uint8_t rightNib)
 		case 0x5: return;
 		case 0x6: // LSR_ZERO_PAGE
 		{
-			if (memory[firstByteOfInterest] | 0b00000001 == 0b00000001) carryFlag = 1;
+			if ((memory[firstByteOfInterest] | 0b00000001) == 0b00000001) carryFlag = 1;
 			else carryFlag = 0;
 			memory[firstByteOfInterest] >>= 1;
 			negativeFlag = 0;
@@ -464,7 +464,7 @@ void CPU::leftNib4(uint8_t rightNib)
 		case 0x9: return;
 		case 0xA: // LSR_A
 		{
-			if (a | 0b00000001 == 0b00000001) carryFlag = 1;
+			if ((a | 0b00000001) == 0b00000001) carryFlag = 1;
 			else carryFlag = 0;
 			a >>= 1;
 			negativeFlag = 0;
@@ -487,7 +487,7 @@ void CPU::leftNib4(uint8_t rightNib)
 			tmpAddress |= secondByteOfInterest;
 			tmpAddress <<= 8;
 			tmpAddress |= firstByteOfInterest;
-			if (memory[tmpAddress] | 0b00000001 == 0b00000001) carryFlag = 1;
+			if ((memory[tmpAddress] | 0b00000001) == 0b00000001) carryFlag = 1;
 			else carryFlag = 0;
 			memory[tmpAddress] >>= 1;
 			negativeFlag = 0;
@@ -521,7 +521,7 @@ void CPU::leftNib5(uint8_t rightNib)
 			tmpAddress <<= 8;
 			tmpAddress |= firstByteOfInterest;
 			tmpAddress += x;
-			if (memory[tmpAddress] | 0b00000001 == 0b00000001) carryFlag = 1;
+			if ((memory[tmpAddress] | 0b00000001) == 0b00000001) carryFlag = 1;
 			else carryFlag = 0;
 			memory[tmpAddress] >>= 1;
 			negativeFlag = 0;
@@ -531,7 +531,7 @@ void CPU::leftNib5(uint8_t rightNib)
 		}
 		case 0x6: // LSR_ZERO_PAGE_X
 		{
-			if (memory[firstByteOfInterest+x] | 0b00000001 == 0b00000001) carryFlag = 1;
+			if ((memory[firstByteOfInterest+x] | 0b00000001) == 0b00000001) carryFlag = 1;
 			else carryFlag = 0;
 			memory[firstByteOfInterest+x] >>= 1;
 			negativeFlag = 0;
@@ -567,7 +567,7 @@ void CPU::leftNib6(uint8_t rightNib)
 			x += firstByteOfInterest;
 
 			a += memory[x];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -575,7 +575,7 @@ void CPU::leftNib6(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmp^a) & (memory[x]^a) & 0x80 != 0)
+			if (((tmp^a) & (memory[x]^a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -592,7 +592,7 @@ void CPU::leftNib6(uint8_t rightNib)
 		{
 			uint8_t tmp = a;
 			a += memory[firstByteOfInterest];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -600,7 +600,7 @@ void CPU::leftNib6(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmp^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmp^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -617,7 +617,7 @@ void CPU::leftNib6(uint8_t rightNib)
 		{
 			uint8_t tmp = a;
 			a += firstByteOfInterest;
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -625,7 +625,7 @@ void CPU::leftNib6(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmp^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmp^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -653,7 +653,7 @@ void CPU::leftNib6(uint8_t rightNib)
 			tmp <<= 8;
 			tmp |= firstByteOfInterest;
 			a += memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -661,7 +661,7 @@ void CPU::leftNib6(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmpA^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmpA^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -693,7 +693,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			uint8_t tmp = a;
 			y += memory[firstByteOfInterest];
 			a += y;
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -701,7 +701,7 @@ void CPU::leftNib7(uint8_t rightNib)
 				zeroFlag = 0;
 			else
 				zeroFlag = 1;
-			if ((tmp^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmp^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -720,7 +720,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			uint8_t tmp = (x + firstByteOfInterest);
 
 			a += memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -728,7 +728,7 @@ void CPU::leftNib7(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmpA^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmpA^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -754,7 +754,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			tmp |= firstByteOfInterest;
 			tmp += y;
 			a += memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -762,7 +762,7 @@ void CPU::leftNib7(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmpA^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmpA^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
@@ -784,7 +784,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			tmp |= firstByteOfInterest;
 			tmp += x;
 			a += memory[tmp];
-			if (a & 0b10000000 == 0b10000000)
+			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
@@ -792,7 +792,7 @@ void CPU::leftNib7(uint8_t rightNib)
 				zeroFlag = 1;
 			else
 				zeroFlag = 0;
-			if ((tmpA^a) & (memory[x] ^ a) & 0x80 != 0)
+			if (((tmpA^a) & (memory[x] ^ a) & 0x80) != 0)
 				overflowFlag = 1;
 			else
 				overflowFlag = 0;
