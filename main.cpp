@@ -39,12 +39,11 @@ int main(int argc, char *argv[])
 
 	if (debugging)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 15; i++)
 		{
 			cpu->determineOpCode();
 			cpu->printStatus();
-			cpu->printMemory(cpu->CARTRIDGE_MEMORY_START, cpu->CARTRIDGE_MEMORY_START + 0xA);
-			//cpu->printMemory(0x0, 0xA);
+			printf("\n");
 		}
 	}
 
