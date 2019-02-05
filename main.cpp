@@ -39,7 +39,13 @@ int main(int argc, char *argv[])
 
 	if (debugging)
 	{
-		cpu->printMemory(cpu->CARTRIDGE_MEMORY_START, cpu->CARTRIDGE_MEMORY_START+0xA);
+		for (int i = 0; i < 3; i++)
+		{
+			cpu->determineOpCode();
+			cpu->printStatus();
+			cpu->printMemory(cpu->CARTRIDGE_MEMORY_START, cpu->CARTRIDGE_MEMORY_START + 0xA);
+			//cpu->printMemory(0x0, 0xA);
+		}
 	}
 
 	system("pause");
