@@ -1,2 +1,3 @@
 ﻿  cpu.cpp
-  cnesnes.vcxproj -> D:\cnesnes\Debug\cnesnes.exe
+f:\cnesnes\cpu.cpp(325): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+  cnesnes.vcxproj -> F:\cnesnes\Debug\cnesnes.exe

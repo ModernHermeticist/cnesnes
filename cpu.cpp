@@ -318,7 +318,16 @@ void CPU::leftNib2(uint8_t rightNib)
 				zeroFlag = false;
 			pc += 0x2;
 		}
-		case 0xA: return;
+		case 0xA: // ROL_A
+		{
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((a & 0b10000000) == 0b10000000) carryFlag = 1;
+			else carryFlag = 0;
+			a <<= 0x1;
+			if (carryFlag == 1) a |= 0b00000001;
+			else a &= 0b11111110;
+		}
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: // AND_ABSOLUTE
@@ -820,9 +829,17 @@ void CPU::leftNib8(uint8_t rightNib)
 		case 0x5: return;
 		case 0x6: return;
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // DEY
+		{
+			y -= 0x1;
+			pc += 0x1;
+		}
 		case 0x9: return;
-		case 0xA: return;
+		case 0xA: // TXA
+		{
+			a = x;
+			pc += 0x1;
+		}
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: return;
@@ -850,7 +867,11 @@ void CPU::leftNib9(uint8_t rightNib)
 		case 0x5: return;
 		case 0x6: return;
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // TYA
+		{
+			a = y;
+			pc += 0x1;
+		}
 		case 0x9: return;
 		case 0xA: return;
 		case 0xB: return;
@@ -944,7 +965,11 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x2;
 		}
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // TAY
+		{
+			y = a;
+			pc += 0x1;
+		}
 		case 0x9: // LDA_IMMEDIATE
 		{
 			a = firstByteOfInterest;
@@ -956,7 +981,11 @@ void CPU::leftNibA(uint8_t rightNib)
 			else zeroFlag = 0;
 			pc += 0x2;
 		}
-		case 0xA: return;
+		case 0xA: // TAX
+		{
+			x = a;
+			pc += 0x1;
+		}
 		case 0xB: return;
 		case 0xC: // LDY_ABSOLUTE
 		{
@@ -1164,7 +1193,7 @@ void CPU::leftNibC(uint8_t rightNib)
 		case 0x6: // DEC_ZERO_PAGE
 		{
 			uint8_t tmp;
-			memory[firstByteOfInterest] -= 0x1;
+			memory[firstByteOfInterest] -= (uint8_t)0x1;
 			tmp = memory[firstByteOfInterest];
 			if (tmp == 0) zeroFlag = 1;
 			else zeroFlag = 0;
@@ -1174,9 +1203,17 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x2;
 		}
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // INY
+		{
+			y += 0x1;
+			pc += 0x1;
+		}
 		case 0x9: return;
-		case 0xA: return;
+		case 0xA: // DEX
+		{
+			x -= 0x1;
+			pc += 0x1;
+		}
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: return;
@@ -1218,7 +1255,7 @@ void CPU::leftNibD(uint8_t rightNib)
 		case 0x6: // DEC_ZERO_PAGE_X
 		{
 			uint8_t tmp;
-			memory[firstByteOfInterest+x] -= 0x1;
+			memory[firstByteOfInterest+x] -= (uint8_t)0x1;
 			tmp = memory[firstByteOfInterest+x];
 			if (tmp == 0) zeroFlag = 1;
 			else zeroFlag = 0;
@@ -1238,7 +1275,22 @@ void CPU::leftNibD(uint8_t rightNib)
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: return;
-		case 0xE: return;
+		case 0xE: // DEC_ABSOLUTE_X
+		{
+			uint16_t tmpAddress = secondByteOfInterest;
+			uint8_t tmp;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			tmpAddress += x;
+			memory[tmpAddress] -= 0x1;
+			tmp = memory[tmpAddress];
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (tmp == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x3;
+		}
 		case 0xF: return;
 		default: std::cout << "I don't know what this is.\n";
 	}
@@ -1254,15 +1306,47 @@ void CPU::leftNibE(uint8_t rightNib)
 		case 0x3: return;
 		case 0x4: return;
 		case 0x5: return;
-		case 0x6: return;
+		case 0x6: // INC_ZERO_PAGE
+		{
+			uint8_t tmp;
+			memory[firstByteOfInterest] += (uint8_t)0x1;
+			tmp = memory[firstByteOfInterest];
+			if (tmp == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+		}
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // INX
+		{
+			x += 0x1;
+			pc += 0x1;
+		}
 		case 0x9: return;
-		case 0xA: return;
+		case 0xA: // NOP
+		{
+			pc += 0x1;
+		}
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: return;
-		case 0xE: return;
+		case 0xE: // INC_ABSOLUTE
+		{
+			uint16_t tmpAddress = secondByteOfInterest;
+			uint8_t tmp;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			memory[tmpAddress] += 0x1;
+			tmp = memory[tmpAddress];
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (tmp == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x3;
+		}
 		case 0xF: return;
 		default: std::cout << "I don't know what this is.\n";
 	}
@@ -1283,7 +1367,18 @@ void CPU::leftNibF(uint8_t rightNib)
 		case 0x3: return;
 		case 0x4: return;
 		case 0x5: return;
-		case 0x6: return;
+		case 0x6: // INC_ZERO_PAGE_X
+		{
+			uint8_t tmp;
+			memory[firstByteOfInterest + x] += (uint8_t)0x1;
+			tmp = memory[firstByteOfInterest + x];
+			if (tmp == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+		}
 		case 0x7: return;
 		case 0x8: // SET_DECIMAL
 		{
@@ -1295,7 +1390,22 @@ void CPU::leftNibF(uint8_t rightNib)
 		case 0xB: return;
 		case 0xC: return;
 		case 0xD: return;
-		case 0xE: return;
+		case 0xE: // INC_ABSOLUTE_X
+		{
+			uint16_t tmpAddress = secondByteOfInterest;
+			uint8_t tmp;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			tmpAddress += x;
+			memory[tmpAddress] += 0x1;
+			tmp = memory[tmpAddress];
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (tmp == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x3;
+		}
 		case 0xF: return;
 		default: std::cout << "I don't know what this is.\n";
 	}
