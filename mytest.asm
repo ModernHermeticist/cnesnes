@@ -4,8 +4,6 @@ LDY #$40
 TAX
 LDA #$10
 TXA
-STY $10
+STY
 LDA $10
 TAY
-
-times 510-($-$$) db 0

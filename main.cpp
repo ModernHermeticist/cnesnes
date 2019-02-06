@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 			cpu->determineOpCode();
 			cpu->printStatus();
 			printf("\n");
+			system("pause");
 		}
 	}
 

@@ -1,2 +1,5 @@
-﻿  cpu.cpp
-  cnesnes.vcxproj -> D:\cnesnes\Debug\cnesnes.exe
+﻿  cartridge.cpp
+  cpu.cpp
+  main.cpp
+  Generating Code...
+  cnesnes.vcxproj -> F:\cnesnes\Debug\cnesnes.exe

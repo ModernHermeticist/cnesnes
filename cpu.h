@@ -7,6 +7,7 @@ class CPU
 public:
 	const int CARTRIDGE_MEMORY_START = 0x4020;
 	const int MEMORY_END = 0xFFFF;
+	const int STACK_POINTER_OFFSET = 0x100;
 
 
 	CPU();
