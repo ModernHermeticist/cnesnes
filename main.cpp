@@ -34,15 +34,11 @@ int main(int argc, char *argv[])
 
 	if (debugging)
 	{
-		cpu->printStatus();
-	}
-
-	if (debugging)
-	{
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			cpu->determineOpCode();
 			cpu->printStatus();
+			system("pause");
+			cpu->determineOpCode();
 			printf("\n");
 		}
 	}

@@ -1,11 +1,10 @@
-LDA #$44
-LDX #$42
-LDY #$40
-TAX
-LDA #$10
-TXA
-STY $10
-LDA $10
-TAY
-
-times 510-($-$$) db 0
+LDA #$5
+EOR #$10
+LDX #$10
+LDY #$15
+STX $0
+STY $1
+LDA $0
+EOR $1
+LDA $1
+EOR #$5
