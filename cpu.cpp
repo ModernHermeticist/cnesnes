@@ -115,11 +115,33 @@ void CPU::leftNib0(uint8_t rightNib)
 	switch (rightNib)
 	{
 		case 0x0: return;
-		case 0x1: return;
+		case 0x1: // ORA_INDIRECT_X
+		{
+			uint8_t tmp = x + firstByteOfInterest;
+			uint16_t targetAddress = memory[tmp + 1];
+			targetAddress <<= 8;
+			targetAddress |= memory[tmp];
+			a |= memory[targetAddress];
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x2: return;
 		case 0x3: return;
 		case 0x4: return;
-		case 0x5: return;
+		case 0x5: // ORA_ZERO_PAGE
+		{
+			a |= memory[firstByteOfInterest];
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x6: // ASL_ZERO_PAGE
 		{
 			uint8_t tmp = 0x0;
@@ -142,8 +164,32 @@ void CPU::leftNib0(uint8_t rightNib)
 			return;
 		}
 		case 0x7: return;
-		case 0x8: return;
-		case 0x9: return;
+		case 0x8: // PHP
+		{
+			uint8_t tmp = 0x0;
+			if (carryFlag) tmp |= 0b00000001;
+			if (zeroFlag) tmp |= 0b00000010;
+			if (interruptDisable) tmp |= 0b00000100;
+			if (decimalFlag) tmp |= 0b00001000;
+			if (bytePushed) tmp |= 0b000100000;
+			if (bytePushedByInstruction) tmp |= 0b00100000;
+			if (overflowFlag) tmp |= 0b01000000;
+			if (negativeFlag) tmp |= 0b10000000;
+			sp -= 0x1;
+			memory[STACK_POINTER_OFFSET + sp] = tmp;
+			pc += 0x1;
+			return;
+		}
+		case 0x9: // ORA_IMMEDIATE
+		{
+			a |= firstByteOfInterest;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0xA: // ASL_A
 		{
 			uint8_t tmp = 0x0;
@@ -167,7 +213,20 @@ void CPU::leftNib0(uint8_t rightNib)
 		}
 		case 0xB: return;
 		case 0xC: return;
-		case 0xD: return;
+		case 0xD: // ORA_ABSOLUTE
+		{
+			uint16_t tmpAddress = 0x0;
+			tmpAddress = secondByteOfInterest;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			a |= memory[tmpAddress];
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 3;
+			return;
+		}
 		case 0xE: // ASL_ABSOLUTE
 		{
 			uint8_t tmp = 0x0;
@@ -198,7 +257,20 @@ void CPU::leftNib1(uint8_t rightNib)
 				pc += 0x2;
 			return;
 		}
-		case 0x1: return;
+		case 0x1: // ORA_INDIRECT_Y
+		{
+			uint16_t targetAddress = memory[firstByteOfInterest + 1];
+			targetAddress <<= 8;
+			targetAddress |= memory[firstByteOfInterest];
+			targetAddress += y;
+			a |= memory[targetAddress];
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x2: return;
 		case 0x3: return;
 		case 0x4: return;
@@ -279,7 +351,10 @@ void CPU::leftNib2(uint8_t rightNib)
 			targetAddress = secondByteOfInterest;
 			targetAddress <<= 8;
 			targetAddress |= firstByteOfInterest;
-			memory[sp + STACK_POINTER_OFFSET] = pc + 2;
+			memory[sp + STACK_POINTER_OFFSET] = ((pc + 2) >> 8);
+			sp -= 0x1;
+			memory[sp + STACK_POINTER_OFFSET] = ((pc + 2) & 0x00FF);
+			sp -= 0x1;
 			pc = targetAddress;
 			return;
 		}
@@ -311,7 +386,14 @@ void CPU::leftNib2(uint8_t rightNib)
 		case 0x3: return;
 		case 0x4: // BIT_ZERO_PAGE
 		{
-
+			if ((a & memory[firstByteOfInterest]) == 0) zeroFlag = 1;
+			else zeroFlag = 1;
+			if ((memory[firstByteOfInterest] & 0b10000000) == 0b10000000) negativeFlag = 1;
+			else negativeFlag = 0;
+			if ((memory[firstByteOfInterest] & 0b01000000) == 0b01000000) overflowFlag = 1;
+			else overflowFlag = 0;
+			pc += 0x2;
+			return;
 		}
 		case 0x5: // AND_ZERO_PAGE
 		{
@@ -329,7 +411,30 @@ void CPU::leftNib2(uint8_t rightNib)
 		}
 		case 0x6: return;
 		case 0x7: return;
-		case 0x8: return;
+		case 0x8: // PLP
+		{
+			uint8_t tmp = 0x0;
+			sp += 0x1;
+			tmp = memory[STACK_POINTER_OFFSET + sp];
+			if ((tmp & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			if ((tmp & 0b00000010) == 0b00000010) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((tmp & 0b00000100) == 0b00000100) interruptDisable = 1;
+			else interruptDisable = 0;
+			if ((tmp & 0b00001000) == 0b00001000) decimalFlag = 1;
+			else decimalFlag = 0;
+			if ((tmp & 0b00010000) == 0b00010000) bytePushed = 1;
+			else bytePushed = 0;
+			if ((tmp & 0b00100000) == 0b00100000) bytePushedByInstruction = 1;
+			else bytePushedByInstruction = 0;
+			if ((tmp & 0b01000000) == 0b01000000) overflowFlag = 1;
+			else overflowFlag = 0;
+			if ((tmp & 0b10000000) == 0b10000000) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x1;
+			return;
+		}
 		case 0x9: // AND_IMMEDIATE
 		{
 			a &= firstByteOfInterest;
@@ -356,7 +461,20 @@ void CPU::leftNib2(uint8_t rightNib)
 			return;
 		}
 		case 0xB: return;
-		case 0xC: return;
+		case 0xC: // BIT_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			if ((a & memory[targetAddress]) == 0) zeroFlag = 1;
+			else zeroFlag = 1;
+			if ((memory[targetAddress] & 0b10000000) == 0b10000000) negativeFlag = 1;
+			else negativeFlag = 0;
+			if ((memory[targetAddress] & 0b01000000) == 0b01000000) overflowFlag = 1;
+			else overflowFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xD: // AND_ABSOLUTE
 		{
 			uint16_t tmp = 0x0;
@@ -725,7 +843,18 @@ void CPU::leftNib6(uint8_t rightNib)
 {
 	switch (rightNib)
 	{
-		case 0x0: return;
+		case 0x0: // RTS
+		{
+			sp += 0x1;
+			uint8_t firstIndex = memory[sp + STACK_POINTER_OFFSET];
+			sp += 0x1;
+			uint16_t targetAddress = memory[sp + STACK_POINTER_OFFSET];
+			targetAddress <<= 8;
+			targetAddress |= firstIndex;
+			targetAddress += 0x1;
+			pc = targetAddress;
+			return;
+		}
 		case 0x1: // ADC_INDIRECT_X
 		{
 			uint8_t tmp = a;
@@ -785,7 +914,22 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x6: return;
+		case 0x6: // ROR_ZERO_PAGE
+		{
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((memory[firstByteOfInterest] & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			memory[firstByteOfInterest] >>= 0x1;
+			if (tmp == 1) memory[firstByteOfInterest] |= 0b10000000;
+			else memory[firstByteOfInterest] &= 0b01111111;
+			if (memory[firstByteOfInterest] == 0x0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((memory[firstByteOfInterest] >> 7) == 0x1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x7: return;
 		case 0x8: // PLA
 		{
@@ -817,7 +961,22 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0xA: return;
+		case 0xA: // ROR_A
+		{
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((a & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			a >>= 0x1;
+			if (tmp == 1) a |= 0b10000000;
+			else a &= 0b01111111;
+			if (a == 0x0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((a >> 7) == 0x1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x1;
+			return;
+		}
 		case 0xB: return;
 		case 0xC: // JMP_INDIRECT
 		{
@@ -855,7 +1014,26 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 3;
 			return;
 		}
-		case 0xE: return;
+		case 0xE: // ROR_ABSOLUTE
+		{
+			uint16_t tmpAddress = 0x0;
+			tmpAddress = secondByteOfInterest;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((memory[tmpAddress] & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			memory[tmpAddress] >>= 0x1;
+			if (tmp == 1) memory[tmpAddress] |= 0b10000000;
+			else memory[tmpAddress] &= 0b01111111;
+			if (memory[tmpAddress] == 0x0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((memory[tmpAddress] >> 7) == 0x1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xF: return;
 		default: std::cout << "I don't know what this is.\n";
 	}
@@ -931,7 +1109,22 @@ void CPU::leftNib7(uint8_t rightNib)
 			pc += 2;
 			return;
 		}
-		case 0x6: return;
+		case 0x6: // ROR_ZERO_PAGE_X
+		{
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((memory[firstByteOfInterest + x] & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			memory[firstByteOfInterest + x] >>= 0x1;
+			if (tmp == 1) memory[firstByteOfInterest + x] |= 0b10000000;
+			else memory[firstByteOfInterest + x] &= 0b01111111;
+			if (memory[firstByteOfInterest + x] == 0x0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((memory[firstByteOfInterest + x] >> 7) == 0x1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x7: return;
 		case 0x8: // SET_INTERRUPT
 		{
@@ -998,7 +1191,27 @@ void CPU::leftNib7(uint8_t rightNib)
 			pc += 3;
 			return;
 		}
-		case 0xE: return;
+		case 0xE: // ROR_ABSOLUTE_X
+		{
+			uint16_t tmpAddress = 0x0;
+			tmpAddress = secondByteOfInterest;
+			tmpAddress <<= 8;
+			tmpAddress |= firstByteOfInterest;
+			tmpAddress += x;
+			uint8_t tmp = 0x0;
+			if (carryFlag == 1) tmp = 0x1;
+			if ((memory[tmpAddress] & 0b00000001) == 0b00000001) carryFlag = 1;
+			else carryFlag = 0;
+			memory[tmpAddress] >>= 0x1;
+			if (tmp == 1) memory[tmpAddress] |= 0b10000000;
+			else memory[tmpAddress] &= 0b01111111;
+			if (memory[tmpAddress] == 0x0) zeroFlag = 1;
+			else zeroFlag = 0;
+			if ((memory[tmpAddress] >> 7) == 0x1) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xF: return;
 		default: std::cout << "I don't know what this is.\n";
 	}
@@ -1513,12 +1726,56 @@ void CPU::leftNibC(uint8_t rightNib)
 {
 	switch (rightNib)
 	{
-		case 0x0: return;
-		case 0x1: return;
+		case 0x0: // CPY_IMMEDIATE
+		{
+			if (y == firstByteOfInterest) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (y >= firstByteOfInterest) carryFlag = 1;
+			else carryFlag = 0;
+			if (y < firstByteOfInterest) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
+		case 0x1: // CMP_INDIRECT_X
+		{
+			uint8_t tmp = x + firstByteOfInterest;
+			uint16_t targetAddress = memory[tmp + 1];
+			targetAddress <<= 8;
+			targetAddress |= memory[tmp];
+			if (a == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x2: return;
 		case 0x3: return;
-		case 0x4: return;
-		case 0x5: return;
+		case 0x4: // CPY_ZERO_PAGE
+		{
+			if (y == memory[firstByteOfInterest]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (y >= memory[firstByteOfInterest]) carryFlag = 1;
+			else carryFlag = 0;
+			if (y < memory[firstByteOfInterest]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
+		case 0x5: // CMP_ZERO_PAGE
+		{
+			if (a == memory[firstByteOfInterest]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[firstByteOfInterest]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[firstByteOfInterest]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x6: // DEC_ZERO_PAGE
 		{
 			uint8_t tmp;
@@ -1539,7 +1796,17 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0x9: return;
+		case 0x9: // CMP_IMMEDIATE
+		{
+			if (a == firstByteOfInterest) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= firstByteOfInterest) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < firstByteOfInterest) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0xA: // DEX
 		{
 			x -= 0x1;
@@ -1547,8 +1814,34 @@ void CPU::leftNibC(uint8_t rightNib)
 			return;
 		}
 		case 0xB: return;
-		case 0xC: return;
-		case 0xD: return;
+		case 0xC: // CPY_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			if (y == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (y >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (y < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
+		case 0xD: // CMP_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			if (a == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xE: // DEC_ABSOLUTE
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -1581,11 +1874,36 @@ void CPU::leftNibD(uint8_t rightNib)
 			else pc += 0x2;
 			return;
 		}
-		case 0x1: return;
+		case 0x1: // CMP_INDIRECT_Y
+		{
+			uint8_t tmp = firstByteOfInterest;
+			uint16_t targetAddress = memory[tmp + 1];
+			targetAddress <<= 8;
+			targetAddress |= memory[tmp];
+			targetAddress += y;
+			if (a == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x2: return;
 		case 0x3: return;
 		case 0x4: return;
-		case 0x5: return;
+		case 0x5: // CMP_ZERO_PAGE_X
+		{
+			if (a == memory[firstByteOfInterest + x]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[firstByteOfInterest + x]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[firstByteOfInterest + x]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x6: // DEC_ZERO_PAGE_X
 		{
 			uint8_t tmp;
@@ -1606,11 +1924,39 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0x9: return;
+		case 0x9: // CMP_ABSOLUTE_Y
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			targetAddress += y;
+			if (a == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xA: return;
 		case 0xB: return;
 		case 0xC: return;
-		case 0xD: return;
+		case 0xD: // CMP_ABSOLUTE_X
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			targetAddress += x;
+			if (a == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (a >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (a < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xE: // DEC_ABSOLUTE_X
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -1637,11 +1983,31 @@ void CPU::leftNibE(uint8_t rightNib)
 {
 	switch (rightNib)
 	{
-		case 0x0: return;
+		case 0x0: // CPX_IMMEDIATE
+		{
+			if (x == firstByteOfInterest) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (x >= firstByteOfInterest) carryFlag = 1;
+			else carryFlag = 0;
+			if (x < firstByteOfInterest) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x1: return;
 		case 0x2: return;
 		case 0x3: return;
-		case 0x4: return;
+		case 0x4: // CPX_ZERO_PAGE
+		{
+			if (x == memory[firstByteOfInterest]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (x >= memory[firstByteOfInterest]) carryFlag = 1;
+			else carryFlag = 0;
+			if (x < memory[firstByteOfInterest]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x5: return;
 		case 0x6: // INC_ZERO_PAGE
 		{
@@ -1670,7 +2036,20 @@ void CPU::leftNibE(uint8_t rightNib)
 			return;
 		}
 		case 0xB: return;
-		case 0xC: return;
+		case 0xC: // CPX_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			if (x == memory[targetAddress]) zeroFlag = 1;
+			else zeroFlag = 0;
+			if (x >= memory[targetAddress]) carryFlag = 1;
+			else carryFlag = 0;
+			if (x < memory[targetAddress]) negativeFlag = 1;
+			else negativeFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		case 0xD: return;
 		case 0xE: // INC_ABSOLUTE
 		{

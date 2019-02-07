@@ -1,0 +1,15 @@
+indexed indirect
+($00, x)
+add $00 and x
+look up x and x+1
+say x: 02 and x+1: 40
+the target memory location is 4002
+
+indirect indexed
+($00), y
+say y: 02
+look up $00 and $01
+say $00: 54 and $01: 05
+arrange them like this 0554
+add y to this: 0554 + y
+the target memory location is 0552
