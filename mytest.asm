@@ -1,10 +1,3 @@
 LDA #$5
-EOR #$10
-LDX #$10
-LDY #$15
-STX $0
-STY $1
-LDA $0
-EOR $1
-LDA $1
-EOR #$5
+SBC #$3
+NOP

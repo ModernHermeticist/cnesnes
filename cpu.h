@@ -16,6 +16,7 @@ public:
 	void loadCartridgeToMemory(Cartridge *cart);
 	void printMemory();
 	void printMemory(int start, int end);
+	uint16_t getPC();
 	void determineOpCode();
 	void leftNib0(uint8_t rightNib);
 	void leftNib1(uint8_t rightNib);
