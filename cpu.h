@@ -21,6 +21,7 @@ public:
 	uint8_t getA();
 	uint8_t getY();
 	uint8_t getX();
+	uint8_t getSP();
 	void mergePRegister();
 	void determineOpCode();
 	void leftNib0(uint8_t rightNib);
