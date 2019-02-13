@@ -888,17 +888,19 @@ void CPU::leftNib5(uint8_t rightNib)
 		}
 		case 0x1: // EOR_INDIRECT_Y
 		{
-			uint8_t firstIndex;
-			uint8_t secondIndex;
-			uint16_t targetAddress;
-			firstIndex = memory[x];
-			secondIndex = memory[x + 1];
-			targetAddress = secondIndex;
-			targetAddress <<= 8;
-			targetAddress |= firstIndex;
-			y += targetAddress;
-			a ^= memory[targetAddress];
-			if ((a & 0b10000000) == 0b10000000) negativeFlag = 1;
+			uint16_t tmpAddress;
+			uint8_t byte = firstByteOfInterest;
+			uint8_t firstIndex = memory[byte];
+			byte += 1;
+			uint8_t secondIndex = memory[byte];
+			tmpAddress = secondIndex;
+			tmpAddress <<= 8;
+			tmpAddress |= firstIndex;
+			tmpAddress += y;
+			a ^= memory[tmpAddress];
+			uint8_t tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
 			else negativeFlag = 0;
 			if (a == 0) zeroFlag = 1;
 			else zeroFlag = 0;
@@ -1143,11 +1145,20 @@ void CPU::leftNib6(uint8_t rightNib)
 		case 0xB: return;
 		case 0xC: // JMP_INDIRECT
 		{
-			uint16_t tmpAddress = 0x00;
-			tmpAddress |= secondByteOfInterest;
-			tmpAddress <<= 8;
-			tmpAddress |= firstByteOfInterest;
-			pc = memory[tmpAddress];
+			uint16_t targetAddress = 0x00;
+			uint16_t indexLocation = secondByteOfInterest;
+			indexLocation <<= 8;
+			indexLocation |= firstByteOfInterest;
+			if ((indexLocation & 0x00FF) == 0x00FF)
+				indexLocation -= 0x00FF;
+			else indexLocation += 1;
+			targetAddress = memory[indexLocation];
+			if ((indexLocation & 0x00FF) == 0x0000)
+				indexLocation += 0x00FF;
+			else indexLocation -= 1;
+			targetAddress <<= 8;
+			targetAddress |= memory[indexLocation];
+			pc = targetAddress;
 			return;
 		}
 		case 0xD: // ADC_ABSOLUTE
@@ -1220,30 +1231,38 @@ void CPU::leftNib7(uint8_t rightNib)
 		}
 		case 0x1: // ADC_INDIRECT_Y
 		{
-			uint8_t tmp = a;
 			uint16_t tmpAddress;
-			uint8_t firstIndex = memory[firstByteOfInterest];
-			uint8_t secondIndex = memory[firstByteOfInterest + 1];
+			uint8_t tmp = a;
+			uint8_t byte = firstByteOfInterest;
+			uint8_t firstIndex = memory[byte];
+			byte += 1;
+			uint8_t secondIndex = memory[byte];
 			tmpAddress = secondIndex;
 			tmpAddress <<= 8;
 			tmpAddress |= firstIndex;
 			tmpAddress += y;
-			if (a + memory[tmpAddress] > 0x3F) overflowFlag = 1;
-			else overflowFlag = 0;
-			if (a + memory[tmpAddress] > 0xFF) carryFlag = 1;
-			else carryFlag = 0;
 			a += memory[tmpAddress];
-			if (carryFlag = 1) a += 0x1;
+			if (carryFlag == 1)
+			{
+				if (tmp + memory[tmpAddress] + 1 > 0xFF) carryFlag = 1;
+				else carryFlag = 0;
+
+				a += 0x1;
+			}
+			else if (tmp + memory[tmpAddress] > 0xFF) carryFlag = 1;
+			else carryFlag = 0;
+			
+			if (((tmp ^ a) & (memory[tmpAddress] ^ a)) & 0x80) overflowFlag = 1;
+			else overflowFlag = 0;
 			if ((a & 0b10000000) == 0b10000000)
 				negativeFlag = 1;
 			else
 				negativeFlag = 0;
 			if (a == 0x0)
-				zeroFlag = 0;
-			else
 				zeroFlag = 1;
+			else
+				zeroFlag = 0;
 			pc += 0x2;
-			return;
 		}
 		case 0x2: return;
 		case 0x3: return;
@@ -1740,8 +1759,10 @@ void CPU::leftNibB(uint8_t rightNib)
 				the result is the high order 8 bits of the effective address
 			*/
 			uint16_t tmpAddress;
-			uint8_t firstIndex = memory[firstByteOfInterest];
-			uint8_t secondIndex = memory[firstByteOfInterest + 1];
+			uint8_t byte = firstByteOfInterest;
+			uint8_t firstIndex = memory[byte];
+			byte += 1;
+			uint8_t secondIndex = memory[byte];
 			tmpAddress = secondIndex;
 			tmpAddress <<= 8;
 			tmpAddress |= firstIndex;
@@ -2127,7 +2148,7 @@ void CPU::leftNibC(uint8_t rightNib)
 			tmp >>= 7;
 			if (tmp == 1) negativeFlag = 1;
 			else negativeFlag = 0;
-			if (tmp == 0) zeroFlag = 1;
+			if (memory[tmpAddress] == 0) zeroFlag = 1;
 			else zeroFlag = 0;
 			pc += 0x3;
 			return;
@@ -2150,11 +2171,38 @@ void CPU::leftNibD(uint8_t rightNib)
 		}
 		case 0x1: // CMP_INDIRECT_Y
 		{
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
 			uint8_t tmp = firstByteOfInterest;
-			uint16_t targetAddress = memory[tmp + 1];
+			tmp += 1;
+			uint16_t targetAddress = memory[tmp];
+			tmp -= 1;
 			targetAddress <<= 8;
 			targetAddress |= memory[tmp];
 			targetAddress += y;
+			uint8_t diff = a - memory[targetAddress];
+
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x2;
+			return;
+
+
+
 			if (a == memory[targetAddress]) zeroFlag = 1;
 			else zeroFlag = 0;
 			if (a >= memory[targetAddress]) carryFlag = 1;
@@ -2495,7 +2543,7 @@ void CPU::leftNibE(uint8_t rightNib)
 			tmp >>= 7;
 			if (tmp == 1) negativeFlag = 1;
 			else negativeFlag = 0;
-			if (tmp == 0) zeroFlag = 1;
+			if (memory[tmpAddress] == 0) zeroFlag = 1;
 			else zeroFlag = 0;
 			pc += 0x3;
 			return;
@@ -2518,14 +2566,35 @@ void CPU::leftNibF(uint8_t rightNib)
 		}
 		case 0x1: // SBC_INDIRECT_Y
 		{
-			uint16_t targetAddress = memory[firstByteOfInterest + 1];
+			carryFlag = 1;
+			uint8_t tmp = a;
+			uint8_t firstIndex;
+			uint8_t secondIndex;
+			uint16_t targetAddress = 0;
+			uint8_t indexLocation = firstByteOfInterest;
+			firstIndex = memory[indexLocation];
+			indexLocation += 0x1;
+			secondIndex = memory[indexLocation];
+			targetAddress = secondIndex;
 			targetAddress <<= 8;
-			targetAddress |= memory[firstByteOfInterest];
+			targetAddress |= firstIndex;
 			targetAddress += y;
-			a -= memory[targetAddress];
+			if (memory[targetAddress] == 0)
+			{
+				a -= 1;
+			}
+			else if (a >= memory[targetAddress])
+			{
+				a -= memory[targetAddress];
+			}
+			else if (memory[targetAddress] > a)
+			{
+				carryFlag = 0;
+				a = (a + 256) - memory[targetAddress];
+			}
 			if ((a >> 7) == 0b00000001) negativeFlag = 1;
 			else negativeFlag = 0;
-			if (((a << 1) >> 7) == 0b00000001) overflowFlag = 1;
+			if (((tmp ^ memory[targetAddress]) & 0x80) != 0 && ((tmp ^ a) & 0x80) != 0) overflowFlag = 1;
 			else overflowFlag = 0;
 			if (a == 0) zeroFlag = 1;
 			else zeroFlag = 0;
