@@ -1585,7 +1585,23 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return; // 0x83
+		case 0x3: // SAX_INDIRECT_X
+		{
+			uint8_t firstIndex;
+			uint8_t secondIndex;
+			uint16_t targetAddress = 0;
+			uint8_t indexLocation = firstByteOfInterest + x;
+			firstIndex = memory[indexLocation];
+			indexLocation += 0x1;
+			secondIndex = memory[indexLocation];
+			targetAddress = secondIndex;
+			targetAddress <<= 8;
+			targetAddress |= firstIndex;
+			uint8_t tmp = a & x;
+			memory[targetAddress] = tmp;
+			pc += 0x2;
+			return;
+		}
 		case 0x4: // STY_ZERO_PAGE
 		{
 			memory[firstByteOfInterest] = y;
@@ -1604,7 +1620,12 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0x87
+		case 0x7: // SAX_ZERO_PAGE
+		{
+			memory[firstByteOfInterest] = a & x;
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // DEY
 		{
 			y -= 0x1;
@@ -1654,7 +1675,15 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return; // 0x8F
+		case 0xF: // SAX_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			memory[targetAddress] = a & x;
+			pc += 3;
+			return;
+		}
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1707,7 +1736,13 @@ void CPU::leftNib9(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0x97
+		case 0x7: // SAX_ZERO_PAGE_Y
+		{
+			uint8_t targetAddress = firstByteOfInterest + y;
+			memory[targetAddress] = a & x;
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // TYA
 		{
 			a = y;
@@ -1800,7 +1835,30 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return; // 0xA3
+		case 0x3: // LAX_INDIRECT_X
+		{
+			uint8_t firstIndex;
+			uint8_t secondIndex;
+			uint16_t targetAddress = 0;
+			uint8_t indexLocation = firstByteOfInterest + x;
+			firstIndex = memory[indexLocation];
+			indexLocation += 0x1;
+			secondIndex = memory[indexLocation];
+			targetAddress = secondIndex;
+			targetAddress <<= 8;
+			targetAddress |= firstIndex;
+			a = memory[targetAddress];
+			x = memory[targetAddress];
+
+			uint8_t tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x4: // LDY_ZERO_PAGE
 		{
 			y = memory[firstByteOfInterest];
@@ -1837,7 +1895,19 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0xA7
+		case 0x7: // LAX_ZERO_PAGE
+		{
+			a = memory[firstByteOfInterest];
+			x = memory[firstByteOfInterest];
+			uint8_t tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // TAY
 		{
 			y = a;
@@ -1911,7 +1981,23 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return; // 0xAF
+		case 0xF: // LAX_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			uint8_t tmp;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			a = memory[targetAddress];
+			x = memory[targetAddress];
+			tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1957,7 +2043,28 @@ void CPU::leftNibB(uint8_t rightNib)
 			return;
 		}
 		case 0x2: return; // 0xB2
-		case 0x3: return; // 0xB3
+		case 0x3: // LAX_INDIRECT_Y
+		{
+			uint16_t tmpAddress;
+			uint8_t byte = firstByteOfInterest;
+			uint8_t firstIndex = memory[byte];
+			byte += 1;
+			uint8_t secondIndex = memory[byte];
+			tmpAddress = secondIndex;
+			tmpAddress <<= 8;
+			tmpAddress |= firstIndex;
+			tmpAddress += y;
+			a = memory[tmpAddress];
+			x = memory[tmpAddress];
+			uint8_t tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x4: // LDY_ZERO_PAGE_X
 		{
 			uint8_t tmp = firstByteOfInterest + x;
@@ -1997,7 +2104,20 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0xB7
+		case 0x7: // LAX_ZERO_PAGE_Y
+		{
+			uint8_t targetAddress = firstByteOfInterest + y;
+			a = memory[targetAddress];
+			x = memory[targetAddress];
+			uint8_t tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // CLEAR_OVERFLOW
 		{
 			overflowFlag = 0;
@@ -2084,7 +2204,24 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return; // 0xBF
+		case 0xF: // LAX_ABSOLUTE_Y
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			uint8_t tmp;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			targetAddress += y;
+			a = memory[targetAddress];
+			x = memory[targetAddress];
+			tmp = a;
+			tmp >>= 7;
+			if (tmp == 1) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x3;
+			return;
+		}
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2158,7 +2295,46 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return; // 0xC3
+		case 0x3: // DCP_INDIRECT_X
+		{
+			uint8_t tmp = a;
+			uint8_t firstIndex;
+			uint8_t secondIndex;
+			uint16_t targetAddress = 0;
+			uint8_t indexLocation = firstByteOfInterest + x;
+			firstIndex = memory[indexLocation];
+			indexLocation += 0x1;
+			secondIndex = memory[indexLocation];
+			targetAddress = secondIndex;
+			targetAddress <<= 8;
+			targetAddress |= firstIndex;
+
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x2;
+			return;
+		}
 		case 0x4: // CPY_ZERO_PAGE
 		{
 			negativeFlag = 0;
@@ -2220,7 +2396,35 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0xC7
+		case 0x7: // DCP_ZERO_PAGE
+		{
+			uint8_t val = memory[firstByteOfInterest];
+			val -= 0x1;
+			memory[firstByteOfInterest] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t targetAddress = firstByteOfInterest;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // INY
 		{
 			y += 0x1;
@@ -2336,7 +2540,37 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return; // 0xCF
+		case 0xF: // DCP_ABSOLUTE
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x3;
+			return;
+		}
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2351,10 +2585,8 @@ void CPU::leftNibD(uint8_t rightNib)
 			{
 				uint8_t pcRightByte = (uint8_t)pc;
 				uint8_t targetAddress = firstByteOfInterest + 2;
-				uint16_t tmp = targetAddress + pcRightByte;
-				if (tmp > 0xFF)
-					tmp -= 0x100;
-				pc |= tmp;
+				targetAddress += pcRightByte;
+				pc = (pc & 0xFF00) + targetAddress;
 			}
 			else pc += 0x2;
 			return;
@@ -2403,7 +2635,45 @@ void CPU::leftNibD(uint8_t rightNib)
 			return;
 		}
 		case 0x2: return; // 0xD2
-		case 0x3: return; // 0xD3
+		case 0x3: // DCP_INDIRECT_Y
+		{
+			uint16_t targetAddress;
+			uint8_t tmp = a;
+			uint8_t byte = firstByteOfInterest;
+			uint8_t firstIndex = memory[byte];
+			byte += 1;
+			uint8_t secondIndex = memory[byte];
+			targetAddress = secondIndex;
+			targetAddress <<= 8;
+			targetAddress |= firstIndex;
+			targetAddress += y;
+
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x2;
+			return;
+		}
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -2447,7 +2717,35 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return; // 0xD7
+		case 0x7: // DCP_ZERO_PAGE_X
+		{
+			uint8_t targetAddress = firstByteOfInterest + x;
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x2;
+			return;
+		}
 		case 0x8: // CLEAR_DECIMAL
 		{
 			decimalFlag = 0;
@@ -2487,7 +2785,38 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return; // 0xDB
+		case 0xB: // DCP_ABSOLUTE_Y
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			targetAddress += y;
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x3;
+			return;
+		}
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -2538,7 +2867,38 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return; // 0xDF
+		case 0xF: // DCP_ABSOLUTE_X
+		{
+			uint16_t targetAddress = secondByteOfInterest;
+			targetAddress <<= 8;
+			targetAddress |= firstByteOfInterest;
+			targetAddress += x;
+			uint8_t val = memory[targetAddress];
+			val -= 0x1;
+			memory[targetAddress] = val;
+
+			negativeFlag = 0;
+			zeroFlag = 0;
+			carryFlag = 0;
+			uint8_t diff = a - memory[targetAddress];
+			diff >>= 7;
+
+			if (a < memory[targetAddress] && diff == 1) negativeFlag = 1;
+
+			if (a == memory[targetAddress])
+			{
+				zeroFlag = 1;
+				carryFlag = 1;
+			}
+
+			if (a > memory[targetAddress])
+			{
+				carryFlag = 1;
+				if (diff == 1) negativeFlag = 1;
+			}
+			pc += 0x3;
+			return;
+		}
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2720,7 +3080,33 @@ void CPU::leftNibE(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return; // 0xEB
+		case 0xB: // SBC_IMMEDIATE_DUP
+		{
+			uint8_t tmp = a;
+			carryFlag = 1;
+			if (firstByteOfInterest == 0)
+			{
+				a -= 1;
+			}
+
+			else if (a >= firstByteOfInterest)
+			{
+				a -= firstByteOfInterest;
+			}
+			else if (firstByteOfInterest > a)
+			{
+				carryFlag = 0;
+				a = (a + 256) - firstByteOfInterest;
+			}
+			if ((a >> 7) == 0b00000001) negativeFlag = 1;
+			else negativeFlag = 0;
+			if (((tmp ^ firstByteOfInterest) & 0x80) != 0 && ((tmp ^ a) & 0x80) != 0) overflowFlag = 1;
+			else overflowFlag = 0;
+			if (a == 0) zeroFlag = 1;
+			else zeroFlag = 0;
+			pc += 0x2;
+			return;
+		}
 		case 0xC: // CPX_ABSOLUTE
 		{
 			negativeFlag = 0;
