@@ -199,8 +199,8 @@ void CPU::leftNib0(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x02
+		case 0x3: return; // 0x03
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -237,7 +237,7 @@ void CPU::leftNib0(uint8_t rightNib)
 			pc += 2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x07
 		case 0x8: // PHP
 		{
 			uint8_t tmp = 0x0;
@@ -285,7 +285,7 @@ void CPU::leftNib0(uint8_t rightNib)
 			pc += 1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x0B
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -325,7 +325,7 @@ void CPU::leftNib0(uint8_t rightNib)
 			pc += 3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x0F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -363,8 +363,8 @@ void CPU::leftNib1(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x12
+		case 0x3: return; // 0x13
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -404,7 +404,7 @@ void CPU::leftNib1(uint8_t rightNib)
 			pc += 2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x17
 		case 0x8: // CLEAR_CARRY
 		{
 			carryFlag = 0;
@@ -431,7 +431,7 @@ void CPU::leftNib1(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x1B
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -478,7 +478,7 @@ void CPU::leftNib1(uint8_t rightNib)
 			pc += 3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x1F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -525,8 +525,8 @@ void CPU::leftNib2(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x22
+		case 0x3: return; // 0x23
 		case 0x4: // BIT_ZERO_PAGE
 		{
 			if ((a & memory[firstByteOfInterest]) == 0) zeroFlag = 1;
@@ -568,7 +568,7 @@ void CPU::leftNib2(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x27
 		case 0x8: // PLP
 		{
 			uint8_t tmp = 0x0;
@@ -623,7 +623,7 @@ void CPU::leftNib2(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x2B
 		case 0xC: // BIT_ABSOLUTE
 		{
 			uint16_t targetAddress = secondByteOfInterest;
@@ -676,7 +676,7 @@ void CPU::leftNib2(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x2F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -714,8 +714,8 @@ void CPU::leftNib3(uint8_t rightNib)
 			pc += 0x2; 
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x32
+		case 0x3: return; // 0x33
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -754,7 +754,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x37
 		case 0x8: // SET_CARRY
 		{
 			carryFlag = 1;
@@ -785,7 +785,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x3B
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -831,7 +831,7 @@ void CPU::leftNib3(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x3F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -891,8 +891,8 @@ void CPU::leftNib4(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x42
+		case 0x3: return; // 0x43
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -919,7 +919,7 @@ void CPU::leftNib4(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x47
 		case 0x8: // PHA
 		{
 			memory[sp + STACK_POINTER_OFFSET] = a;
@@ -948,7 +948,7 @@ void CPU::leftNib4(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x4B
 		case 0xC: // JMP_ABSOLUTE
 		{
 			uint16_t tmpAddress = 0x00;
@@ -987,7 +987,7 @@ void CPU::leftNib4(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x4F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1024,8 +1024,8 @@ void CPU::leftNib5(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x52
+		case 0x3: return; // 0x53
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -1053,7 +1053,7 @@ void CPU::leftNib5(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x57
 		case 0x8: // CLEAR_INTERRUPT
 		{
 			interruptDisable = 0;
@@ -1079,7 +1079,7 @@ void CPU::leftNib5(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x5B
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -1115,7 +1115,7 @@ void CPU::leftNib5(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x5F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1169,8 +1169,8 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x62
+		case 0x3: return; // 0x63
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -1219,7 +1219,7 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x67
 		case 0x8: // PLA
 		{
 			sp += 0x1;
@@ -1276,7 +1276,7 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x6B
 		case 0xC: // JMP_INDIRECT
 		{
 			uint16_t targetAddress = 0x00;
@@ -1346,7 +1346,7 @@ void CPU::leftNib6(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x6F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1398,8 +1398,8 @@ void CPU::leftNib7(uint8_t rightNib)
 				zeroFlag = 0;
 			pc += 0x2;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x72
+		case 0x3: return; // 0x73
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -1450,7 +1450,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x77
 		case 0x8: // SET_INTERRUPT
 		{
 			interruptDisable = 1;
@@ -1495,7 +1495,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x7B
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -1554,7 +1554,7 @@ void CPU::leftNib7(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x7F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1585,7 +1585,7 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return;
+		case 0x3: return; // 0x83
 		case 0x4: // STY_ZERO_PAGE
 		{
 			memory[firstByteOfInterest] = y;
@@ -1604,7 +1604,7 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x87
 		case 0x8: // DEY
 		{
 			y -= 0x1;
@@ -1615,7 +1615,7 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0x9: return;
+		case 0x9: return; // 0x89
 		case 0xA: // TXA
 		{
 			a = x;
@@ -1626,7 +1626,7 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0x8B
 		case 0xC: // STY_ABSOLUTE
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -1654,7 +1654,7 @@ void CPU::leftNib8(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0x8F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1684,8 +1684,8 @@ void CPU::leftNib9(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0x92
+		case 0x3: return; // 0x93
 		case 0x4: // STY_ZERO_PAGE_X
 		{
 			uint8_t tmp = firstByteOfInterest + x;
@@ -1707,7 +1707,7 @@ void CPU::leftNib9(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0x97
 		case 0x8: // TYA
 		{
 			a = y;
@@ -1731,8 +1731,8 @@ void CPU::leftNib9(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
-		case 0xC: return;
+		case 0xB: return; // 0x9B
+		case 0xC: return; // 0x9C
 		case 0xD: // STA_ABSOLUTE_X
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -1743,8 +1743,8 @@ void CPU::leftNib9(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xE: return;
-		case 0xF: return;
+		case 0xE: return; // 0x9E
+		case 0xF: return; // 0x9F
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1800,7 +1800,7 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return;
+		case 0x3: return; // 0xA3
 		case 0x4: // LDY_ZERO_PAGE
 		{
 			y = memory[firstByteOfInterest];
@@ -1837,7 +1837,7 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xA7
 		case 0x8: // TAY
 		{
 			y = a;
@@ -1862,7 +1862,7 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xAB
 		case 0xC: // LDY_ABSOLUTE
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -1911,7 +1911,7 @@ void CPU::leftNibA(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xAF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -1956,8 +1956,8 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0xB2
+		case 0x3: return; // 0xB3
 		case 0x4: // LDY_ZERO_PAGE_X
 		{
 			uint8_t tmp = firstByteOfInterest + x;
@@ -1997,7 +1997,7 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xB7
 		case 0x8: // CLEAR_OVERFLOW
 		{
 			overflowFlag = 0;
@@ -2032,7 +2032,7 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xBB
 		case 0xC: // LDY_ABSOLUTE_X
 		{
 			uint16_t tmpAddress = secondByteOfInterest;
@@ -2084,7 +2084,7 @@ void CPU::leftNibB(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xBF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2158,7 +2158,7 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return;
+		case 0x3: return; // 0xC3
 		case 0x4: // CPY_ZERO_PAGE
 		{
 			negativeFlag = 0;
@@ -2220,7 +2220,7 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xC7
 		case 0x8: // INY
 		{
 			y += 0x1;
@@ -2265,7 +2265,7 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xCB
 		case 0xC: // CPY_ABSOLUTE
 		{
 			negativeFlag = 0;
@@ -2336,7 +2336,7 @@ void CPU::leftNibC(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xCF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2349,7 +2349,7 @@ void CPU::leftNibD(uint8_t rightNib)
 		{
 			if (!zeroFlag)
 			{
-				uint8_t pcRightByte = pc;
+				uint8_t pcRightByte = (uint8_t)pc;
 				uint8_t targetAddress = firstByteOfInterest + 2;
 				uint16_t tmp = targetAddress + pcRightByte;
 				if (tmp > 0xFF)
@@ -2402,8 +2402,8 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0xD2
+		case 0x3: return; // 0xD3
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -2447,7 +2447,7 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xD7
 		case 0x8: // CLEAR_DECIMAL
 		{
 			decimalFlag = 0;
@@ -2487,7 +2487,7 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xDB
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -2538,7 +2538,7 @@ void CPU::leftNibD(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xDF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2612,7 +2612,7 @@ void CPU::leftNibE(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x3: return;
+		case 0x3: return; // 0xE3
 		case 0x4: // CPX_ZERO_PAGE
 		{
 			negativeFlag = 0;
@@ -2677,7 +2677,7 @@ void CPU::leftNibE(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xE7
 		case 0x8: // INX
 		{
 			x += 0x1;
@@ -2720,7 +2720,7 @@ void CPU::leftNibE(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xEB
 		case 0xC: // CPX_ABSOLUTE
 		{
 			negativeFlag = 0;
@@ -2794,7 +2794,7 @@ void CPU::leftNibE(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xEF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
@@ -2847,8 +2847,8 @@ void CPU::leftNibF(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x2: return;
-		case 0x3: return;
+		case 0x2: return; // 0xF2
+		case 0x3: return; // 0xF3
 		case 0x4: // SKB
 		{
 			pc += 0x2;
@@ -2895,7 +2895,7 @@ void CPU::leftNibF(uint8_t rightNib)
 			pc += 0x2;
 			return;
 		}
-		case 0x7: return;
+		case 0x7: return; // 0xF7
 		case 0x8: // SET_DECIMAL
 		{
 			decimalFlag = 1;
@@ -2938,7 +2938,7 @@ void CPU::leftNibF(uint8_t rightNib)
 			pc += 0x1;
 			return;
 		}
-		case 0xB: return;
+		case 0xB: return; // 0xFB
 		case 0xC: // SKW
 		{
 			pc += 0x3;
@@ -2992,7 +2992,7 @@ void CPU::leftNibF(uint8_t rightNib)
 			pc += 0x3;
 			return;
 		}
-		case 0xF: return;
+		case 0xF: return; // 0xFF
 		default: std::cout << "I don't know what this is.\n";
 	}
 }
