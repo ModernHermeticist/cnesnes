@@ -17,11 +17,14 @@ public:
 	void printMemory();
 	void printMemory(int start, int end);
 	uint16_t getPC();
+	void setPC(uint16_t val);
 	uint8_t getP();
 	uint8_t getA();
 	uint8_t getY();
 	uint8_t getX();
 	uint8_t getSP();
+	uint16_t getMemoryOffset();
+	void setMemoryOffset(uint16_t val);
 	void mergePRegister();
 	void determineOpCode();
 	void leftNib0(uint8_t rightNib);
@@ -50,6 +53,8 @@ private:
 	uint16_t pc; // two byte wide program counter
 	uint8_t sp;  // byte wide stack pointer
 	uint8_t p;   // byte wide status register
+
+	uint16_t memoryOffset;
 
 	uint8_t firstByteOfInterest; // first byte to look at after opcode
 	uint8_t secondByteOfInterest; // second byte to look at after opcode

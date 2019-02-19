@@ -1,6 +1,7 @@
 #include "main.h"
 
-bool debugging = true;
+bool usingTestFile = true;
+bool debugging = false;
 
 
 int main(int argc, char *argv[])
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
 		printf("\n");
 	}
 
-	if (debugging)
+	if (usingTestFile)
 	{
 		logFile.open("nestest_log.txt");
 		if (!logFile.is_open())
@@ -42,9 +43,15 @@ int main(int argc, char *argv[])
 
 	CPU *cpu = new CPU();
 
+	if (usingTestFile)
+	{
+		cpu->setPC(0xC000);
+		cpu->setMemoryOffset(0xBFF0);
+	}
+
 	cpu->loadCartridgeToMemory(cart);
 
-	if (debugging)
+	if (usingTestFile)
 	{
 		uint16_t oldPC = 0x0;
 		uint8_t p = 0x0;
@@ -58,16 +65,25 @@ int main(int argc, char *argv[])
 		std::string logX;
 		std::string logY;
 		std::string logSP;
-		int counter = 0;
+		int counter = 1;
 		while(true)
 		{
-			std::getline(logFile, logLine);
-			logP = logLine.substr(65, 2);
-			logA = logLine.substr(50, 2);
-			logX = logLine.substr(55, 2);
-			logY = logLine.substr(60, 2);
-			logSP = logLine.substr(71, 2);
-			logLine = logLine.substr(0, 4);
+			if (usingTestFile)
+			{
+				std::getline(logFile, logLine);
+				if (!logFile)
+				{
+					printf("End of Cartridge Reached!\n");
+					system("pause");
+					return 0;
+				}
+				logP = logLine.substr(65, 2);
+				logA = logLine.substr(50, 2);
+				logX = logLine.substr(55, 2);
+				logY = logLine.substr(60, 2);
+				logSP = logLine.substr(71, 2);
+				logLine = logLine.substr(0, 4);
+			}
 			cpu->mergePRegister();
 			oldPC = cpu->getPC();
 			p = cpu->getP();
@@ -75,63 +91,87 @@ int main(int argc, char *argv[])
 			y = cpu->getY();
 			x = cpu->getX();
 			sp = cpu->getSP();
-			printf("Counter: %d\n", counter);
-			std::cout << "logLine: " << logLine << std::endl;
-			std::cout << "PC:      " << std::hex << cpu->getPC() << std::endl;
-			std::cout << "logP: 0x" << logP << std::endl;
-			printf("P:    %#x\n", p);
-			std::cout << "logA: 0x" << logA << std::endl;
-			printf("A:    %#x\n", a);
-			std::cout << "logX: 0x" << logX << std::endl;
-			printf("X:    %#x\n", x);
-			std::cout << "logY: 0x" << logY << std::endl;
-			printf("Y:    %#x\n", y);
-			std::cout << "logSP: 0x" << logSP << std::endl;
-			printf("SP:    %#x\n", sp);
-			cpu->printStatus();
-			if (std::stoi(logLine, nullptr, 16) != oldPC)
+			if (debugging)
 			{
-				printf("PC out of sync!\n");
-				system("pause");
-			}
-			if (std::stoi(logP, nullptr, 16) != p) 
-			{
-				printf("P out of sync!\n");
-				system("pause");
-			}
-			if (std::stoi(logA, nullptr, 16) != a)
-			{
+				printf("\n");
+				printf("Counter: %d\n", counter);
+				if (usingTestFile)
 				{
-					printf("A out of sync!\n");
-					system("pause");
+					std::cout << "logLine: " << logLine << std::endl;
 				}
-			}
-			if (std::stoi(logX, nullptr, 16) != x)
-			{
+				std::cout << "PC:      " << std::hex << cpu->getPC() << std::endl;
+				if (usingTestFile)
 				{
-					printf("X out of sync!\n");
-					system("pause");
+					std::cout << "logP: 0x" << logP << std::endl;
 				}
-			}
-			if (std::stoi(logY, nullptr, 16) != y)
-			{
+				printf("P:    %#x\n", p);
+				if (usingTestFile)
 				{
-					printf("Y out of sync!\n");
-					system("pause");
+					std::cout << "logA: 0x" << logA << std::endl;
 				}
-			}
-			if (std::stoi(logSP, nullptr, 16) != sp)
-			{
+				printf("A:    %#x\n", a);
+				if (usingTestFile)
 				{
-					printf("SP out of sync!\n");
-					system("pause");
+					std::cout << "logX: 0x" << logX << std::endl;
+				}
+				printf("X:    %#x\n", x);
+				if (usingTestFile)
+				{
+					std::cout << "logY: 0x" << logY << std::endl;
+				}
+				printf("Y:    %#x\n", y);
+				if (usingTestFile)
+				{
+					std::cout << "logSP: 0x" << logSP << std::endl;
+				}
+				printf("SP:    %#x\n", sp);
+				cpu->printStatus();
+				if (usingTestFile)
+				{
+					if (std::stoi(logLine, nullptr, 16) != oldPC)
+					{
+						printf("PC out of sync!\n");
+						system("pause");
+					}
+					if (std::stoi(logP, nullptr, 16) != p)
+					{
+						printf("P out of sync!\n");
+						system("pause");
+					}
+					if (std::stoi(logA, nullptr, 16) != a)
+					{
+						{
+							printf("A out of sync!\n");
+							system("pause");
+						}
+					}
+					if (std::stoi(logX, nullptr, 16) != x)
+					{
+						{
+							printf("X out of sync!\n");
+							system("pause");
+						}
+					}
+					if (std::stoi(logY, nullptr, 16) != y)
+					{
+						{
+							printf("Y out of sync!\n");
+							system("pause");
+						}
+					}
+					if (std::stoi(logSP, nullptr, 16) != sp)
+					{
+						{
+							printf("SP out of sync!\n");
+							system("pause");
+						}
+					}
 				}
 			}
 			//system("pause");
 			cpu->determineOpCode();
-			printf("\n");
 			//if (cpu->getPC() == oldPC) break;
-			//sleep_for(500ms);
+			//sleep_for(100ms);
 			counter += 1;
 		}
 	}
