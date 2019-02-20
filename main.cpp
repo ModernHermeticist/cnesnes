@@ -6,28 +6,17 @@ bool debugging = true;
 
 int main(int argc, char *argv[])
 {
-	// The window everything is being rendered to
-	SDL_Window* window = NULL;
 
-	// SDL renderer
-	SDL_Renderer* renderer = NULL;
+	Window *mainWindow = new Window;
+	
+	// Event handler
+	SDL_Event e;
 
-	// The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+	mainWindow->initSDL();
 
-	// Image to load (will change eventually)
-	SDL_Surface* helloWorld = NULL;
+	mainWindow->loadMedia();
 
-	SDL_Rect rect = { 100, 100, 100, 100 }; // Test Rect
-
-
-	if (!initSDL(window, screenSurface)) return 1;
-	if (!loadMedia(helloWorld)) return 1;
-	if (helloWorld == NULL) return 1;
-
-	SDL_BlitSurface(helloWorld, NULL, screenSurface, NULL);
-	SDL_RenderDrawRect(renderer, &rect);
-	SDL_UpdateWindowSurface(window);
+	mainWindow->drawSplashScreen();
 
 	std::string romName = argv[1];
 	std::fstream romFile;
@@ -89,6 +78,7 @@ int main(int argc, char *argv[])
 		std::string logY;
 		std::string logSP;
 		int counter = 1;
+		SDL_Delay(2000);
 		while(true)
 		{
 			if (usingTestFile)
@@ -97,8 +87,7 @@ int main(int argc, char *argv[])
 				if (!logFile)
 				{
 					printf("End of Cartridge Reached!\n");
-					system("pause");
-					return 0;
+					break;
 				}
 				logP = logLine.substr(65, 2);
 				logA = logLine.substr(50, 2);
@@ -191,21 +180,24 @@ int main(int argc, char *argv[])
 					}
 				}
 			}
-			//system("pause");
 			cpu->determineOpCode();
-			//if (cpu->getPC() == oldPC) break;
-			//sleep_for(100ms);
 			counter += 1;
 		}
 	}
-
-	system("pause");
+	bool quit = false;
+	while (!quit)
+	{
+		while (SDL_PollEvent(&e) != 0)
+		{
+			if (e.type == SDL_QUIT) quit = true;
+		}
+	}
 
 	romFile.close();
 	logFile.close();
 
 	
-	closeSDL(window, screenSurface, helloWorld);
+	mainWindow->closeSDL();
 	
 
 	return 0;

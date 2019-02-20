@@ -1,6 +1,24 @@
 #include "main.h"
 
-bool initSDL(SDL_Window* &window, SDL_Surface* &screenSurface)
+Window::Window()
+{
+
+}
+
+Window::Window(int width, int height)
+{
+	SCREEN_WIDTH = width;
+	SCREEN_HEIGHT = height;
+}
+
+Window::~Window()
+{
+
+}
+
+
+
+bool Window::initSDL()
 {
 	// Initializing SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -27,11 +45,11 @@ bool initSDL(SDL_Window* &window, SDL_Surface* &screenSurface)
 	return true;
 }
 
-bool loadMedia(SDL_Surface* &helloWorld)
+bool Window::loadMedia()
 {
 	// Load splash image
-	helloWorld = SDL_LoadBMP("test.bmp");
-	if (helloWorld == NULL)
+	splashScreen = SDL_LoadBMP("test.bmp");
+	if (splashScreen == NULL)
 	{
 		printf("Unable to load image %s! SDL Error: %s\n", "test.bmp", SDL_GetError());
 		return false;
@@ -39,7 +57,14 @@ bool loadMedia(SDL_Surface* &helloWorld)
 	return true;
 }
 
-void closeSDL(SDL_Window* window, SDL_Surface* screenSurface, SDL_Surface* splashScreen)
+void Window::drawSplashScreen()
+{
+	SDL_BlitSurface(splashScreen, NULL, screenSurface, NULL);
+	SDL_UpdateWindowSurface(window);
+	SDL_Delay(2000);
+}
+
+void Window::closeSDL()
 {
 	// Deallocate surfaces
 	SDL_FreeSurface(splashScreen);

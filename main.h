@@ -4,6 +4,8 @@
 #define MAIN_H
 
 #include "SDL.h"
+#include "SDL_image.h"
+#include "SDL_ttf.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -17,10 +19,6 @@
 
 using namespace std::this_thread;
 using namespace std::chrono_literals;
-
-// Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
 
 
 #endif

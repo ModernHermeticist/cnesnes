@@ -3,14 +3,48 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-// Starts up SDL and creates our window
-bool initSDL(SDL_Window* &window, SDL_Surface* &screenSurface);
 
-// Loads any media
-bool loadMedia(SDL_Surface* &helloWorld);
+class Window
+{
+	public:
 
-// Frees media and shuts down SDL
-void closeSDL(SDL_Window* window, SDL_Surface* screenSurface, SDL_Surface* splashScreen);
+	// Screen dimension constants
+	int SCREEN_WIDTH = 640;
+	int SCREEN_HEIGHT = 480;
+
+	Window();
+	Window(int width, int height);
+	~Window();
+	// Starts up SDL and creates our window
+	bool initSDL();
+
+	// Loads any media
+	bool loadMedia();
+
+	// Frees media and shuts down SDL
+	void closeSDL();
+
+	void drawSplashScreen();
+
+	private:
+
+	// The window everything is being rendered to
+	SDL_Window* window = NULL;
+
+	// SDL renderer
+	SDL_Renderer* renderer = NULL;
+
+	// The surface contained by the window
+	SDL_Surface* screenSurface = NULL;
+
+	// Image to load (will change eventually)
+	SDL_Surface* splashScreen = NULL;
+
+	// Test Rect
+	SDL_Rect rect = { 100, 100, 100, 100 };
+
+};
+
 
 
 #endif
