@@ -1,11 +1,34 @@
 #include "main.h"
 
 bool usingTestFile = true;
-bool debugging = false;
+bool debugging = true;
 
 
 int main(int argc, char *argv[])
 {
+	// The window everything is being rendered to
+	SDL_Window* window = NULL;
+
+	// SDL renderer
+	SDL_Renderer* renderer = NULL;
+
+	// The surface contained by the window
+	SDL_Surface* screenSurface = NULL;
+
+	// Image to load (will change eventually)
+	SDL_Surface* helloWorld = NULL;
+
+	SDL_Rect rect = { 100, 100, 100, 100 }; // Test Rect
+
+
+	if (!initSDL(window, screenSurface)) return 1;
+	if (!loadMedia(helloWorld)) return 1;
+	if (helloWorld == NULL) return 1;
+
+	SDL_BlitSurface(helloWorld, NULL, screenSurface, NULL);
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_UpdateWindowSurface(window);
+
 	std::string romName = argv[1];
 	std::fstream romFile;
 	std::fstream logFile;
@@ -180,6 +203,10 @@ int main(int argc, char *argv[])
 
 	romFile.close();
 	logFile.close();
+
+	
+	closeSDL(window, screenSurface, helloWorld);
+	
 
 	return 0;
 }
