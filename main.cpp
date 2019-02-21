@@ -8,13 +8,14 @@ int main(int argc, char *argv[])
 {
 
 	Window *mainWindow = new Window;
+	std::string image = "test.bmp";
 	
 	// Event handler
 	SDL_Event e;
 
 	mainWindow->initSDL();
 
-	mainWindow->loadMedia();
+	if (mainWindow->loadMedia(image) == false) return 1;
 
 	mainWindow->drawSplashScreen();
 
@@ -198,6 +199,7 @@ int main(int argc, char *argv[])
 
 	
 	mainWindow->closeSDL();
+	delete mainWindow;
 	
 
 	return 0;

@@ -45,21 +45,34 @@ bool Window::initSDL()
 	return true;
 }
 
-bool Window::loadMedia()
+bool Window::loadMedia(std::string path)
 {
+	// Final optimized surface
+	SDL_Surface *optimizedSurface = NULL;
 	// Load splash image
-	splashScreen = SDL_LoadBMP("test.bmp");
-	if (splashScreen == NULL)
+	SDL_Surface *loadedSurface = SDL_LoadBMP(path.c_str());
+	if (imageToShow == NULL)
 	{
-		printf("Unable to load image %s! SDL Error: %s\n", "test.bmp", SDL_GetError());
+		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 		return false;
 	}
+
+	optimizedSurface = SDL_ConvertSurface(loadedSurface, screenSurface->format, NULL);
+	if (optimizedSurface == NULL)
+	{
+		printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+		return false;
+	}
+
+	SDL_FreeSurface(loadedSurface);
+
+	imageToShow = optimizedSurface;
 	return true;
 }
 
 void Window::drawSplashScreen()
 {
-	SDL_BlitSurface(splashScreen, NULL, screenSurface, NULL);
+	SDL_BlitSurface(imageToShow, NULL, screenSurface, NULL);
 	SDL_UpdateWindowSurface(window);
 	SDL_Delay(2000);
 }
@@ -67,9 +80,9 @@ void Window::drawSplashScreen()
 void Window::closeSDL()
 {
 	// Deallocate surfaces
-	SDL_FreeSurface(splashScreen);
+	SDL_FreeSurface(imageToShow);
 	SDL_FreeSurface(screenSurface);
-	splashScreen = NULL;
+	imageToShow = NULL;
 	screenSurface = NULL;
 
 	// Destroy window

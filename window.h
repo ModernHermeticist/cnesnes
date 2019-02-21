@@ -19,7 +19,7 @@ class Window
 	bool initSDL();
 
 	// Loads any media
-	bool loadMedia();
+	bool loadMedia(std::string path);
 
 	// Frees media and shuts down SDL
 	void closeSDL();
@@ -38,7 +38,7 @@ class Window
 	SDL_Surface* screenSurface = NULL;
 
 	// Image to load (will change eventually)
-	SDL_Surface* splashScreen = NULL;
+	SDL_Surface* imageToShow = NULL;
 
 	// Test Rect
 	SDL_Rect rect = { 100, 100, 100, 100 };
