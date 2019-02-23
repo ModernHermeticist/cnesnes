@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\cnesnes\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\cnesnes\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\cnesnes\SDL2-2.0.9\include;F:\cnesnes\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\cnesnes\SDL2-2.0.9\lib\x86;F:\cnesnes\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -79,7 +79,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\cnesnes\SDL2-2.0.9\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\cnesnes\SDL2-2.0.9\include;F:\cnesnes\SDL2-2.0.9\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>

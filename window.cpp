@@ -51,7 +51,7 @@ bool Window::loadMedia(std::string path)
 	SDL_Surface *optimizedSurface = NULL;
 	// Load splash image
 	SDL_Surface *loadedSurface = SDL_LoadBMP(path.c_str());
-	if (imageToShow == NULL)
+	if (loadedSurface == NULL)
 	{
 		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 		return false;

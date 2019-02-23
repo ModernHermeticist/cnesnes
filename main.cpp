@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	// Event handler
 	SDL_Event e;
 
-	mainWindow->initSDL();
+	if (mainWindow->initSDL() == false) return 1;
 
 	if (mainWindow->loadMedia(image) == false) return 1;
 
