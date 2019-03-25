@@ -21,6 +21,16 @@ class Window
 	// Loads any media
 	bool loadMedia(std::string path);
 
+	// Loads texture
+	bool loadTexture(std::string path);
+
+	bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
+
+	// wrapper rendering function
+	void render(int x, int y, SDL_Texture *texture);
+
+	void updateTextureDisplay();
+
 	// Frees media and shuts down SDL
 	void closeSDL();
 
@@ -40,8 +50,23 @@ class Window
 	// Image to load (will change eventually)
 	SDL_Surface* imageToShow = NULL;
 
+	// currently displaying texture
+	SDL_Texture *texture = NULL;
+
+	SDL_Texture *textTexture = NULL;
+
+	// current font
+	TTF_Font *font = NULL;
+
 	// Test Rect
-	SDL_Rect rect = { 100, 100, 100, 100 };
+	SDL_Rect consoleWindow = { 0,0,0,0 };
+
+	// Image dimensions
+	int iWidth;
+	int iHeight;
+
+	// Font Size
+	int fontSize = 24;
 
 };
 

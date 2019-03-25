@@ -2,6 +2,8 @@
 
 bool usingTestFile = true;
 bool debugging = true;
+bool debuggingTestFile = true;
+bool debuggingSDL = true;
 
 
 int main(int argc, char *argv[])
@@ -9,6 +11,8 @@ int main(int argc, char *argv[])
 
 	Window *mainWindow = new Window;
 	std::string image = "test.bmp";
+	std::string font = "yay.png";
+	//int lineCount = 0;
 	
 	// Event handler
 	SDL_Event e;
@@ -16,6 +20,8 @@ int main(int argc, char *argv[])
 	if (mainWindow->initSDL() == false) return 1;
 
 	if (mainWindow->loadMedia(image) == false) return 1;
+
+	if (mainWindow->loadTexture(font) == false) return 1;
 
 	mainWindow->drawSplashScreen();
 
@@ -82,6 +88,7 @@ int main(int argc, char *argv[])
 		SDL_Delay(2000);
 		while(true)
 		{
+			//SDL_Delay(1000);
 			if (usingTestFile)
 			{
 				std::getline(logFile, logLine);
@@ -113,31 +120,40 @@ int main(int argc, char *argv[])
 					std::cout << "logLine: " << logLine << std::endl;
 				}
 				std::cout << "PC:      " << std::hex << cpu->getPC() << std::endl;
+
 				if (usingTestFile)
 				{
-					std::cout << "logP: 0x" << logP << std::endl;
+					std::cout << "logP:    0x" << logP << std::endl;
 				}
-				printf("P:    %#x\n", p);
+				printf("P:       %#x\n", p);
+				printf("_____________\n");
 				if (usingTestFile)
 				{
-					std::cout << "logA: 0x" << logA << std::endl;
+					std::cout << "logA:    0x" << logA << std::endl;
 				}
-				printf("A:    %#x\n", a);
+				if (a == 0) printf("A:       0x00\n");
+				else printf("A:       %#x\n", a);
+				printf("_____________\n");
 				if (usingTestFile)
 				{
-					std::cout << "logX: 0x" << logX << std::endl;
+					std::cout << "logX:    0x" << logX << std::endl;
 				}
-				printf("X:    %#x\n", x);
+				if (x == 0) printf("X:       0x00\n");
+				else printf("X:       %#x\n", x);
+				printf("_____________\n");
 				if (usingTestFile)
 				{
-					std::cout << "logY: 0x" << logY << std::endl;
+					std::cout << "logY:    0x" << logY << std::endl;
 				}
-				printf("Y:    %#x\n", y);
+				if (y == 0) printf("Y:       0x00\n");
+				else printf("Y:       %#x\n", y);
+				printf("_____________\n");
 				if (usingTestFile)
 				{
-					std::cout << "logSP: 0x" << logSP << std::endl;
+					std::cout << "logSP:   0x" << logSP << std::endl;
 				}
-				printf("SP:    %#x\n", sp);
+				printf("SP:      %#x\n", sp);
+				printf("___________________________________________________________________\n");
 				cpu->printStatus();
 				if (usingTestFile)
 				{
@@ -191,7 +207,41 @@ int main(int argc, char *argv[])
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT) quit = true;
+
+			else if (e.type == SDL_KEYDOWN)
+			{
+				switch (e.key.keysym.sym)
+				{
+					case SDLK_UP:
+					{
+						if (debuggingSDL) printf("\nUp key pressed!\n");
+						break;
+					}
+					case SDLK_DOWN:
+					{
+						if (debuggingSDL) printf("\nDown key pressed!\n");
+						break;
+					}
+					case SDLK_LEFT:
+					{
+						if (debuggingSDL) printf("\nLeft key pressed!\n");
+						break;
+					}
+					case SDLK_RIGHT:
+					{
+						if (debuggingSDL) printf("\nRight key pressed!\n");
+						break;
+					}
+					case SDLK_ESCAPE:
+					{
+						quit = true;
+						break;
+					}
+					default: break;
+				}
+			}
 		}
+		mainWindow->updateTextureDisplay();
 	}
 
 	romFile.close();
