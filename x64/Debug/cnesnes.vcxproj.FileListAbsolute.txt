@@ -1,0 +1,2 @@
+E:\c\cnesnes\x64\Debug\cnesnes.exe
+E:\c\cnesnes\x64\Debug\cnesnes.pdb

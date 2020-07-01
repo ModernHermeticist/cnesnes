@@ -8,22 +8,9 @@ bool debuggingSDL = true;
 
 int main(int argc, char *argv[])
 {
-
-	Window *mainWindow = new Window;
 	std::string image = "test.bmp";
 	std::string font = "yay.png";
 	//int lineCount = 0;
-	
-	// Event handler
-	SDL_Event e;
-
-	if (mainWindow->initSDL() == false) return 1;
-
-	if (mainWindow->loadMedia(image) == false) return 1;
-
-	if (mainWindow->loadTexture(font) == false) return 1;
-
-	mainWindow->drawSplashScreen();
 
 	std::string romName = argv[1];
 	std::fstream romFile;
@@ -85,7 +72,6 @@ int main(int argc, char *argv[])
 		std::string logY;
 		std::string logSP;
 		int counter = 1;
-		SDL_Delay(2000);
 		while(true)
 		{
 			//SDL_Delay(1000);
@@ -201,56 +187,8 @@ int main(int argc, char *argv[])
 			counter += 1;
 		}
 	}
-	bool quit = false;
-	while (!quit)
-	{
-		while (SDL_PollEvent(&e) != 0)
-		{
-			if (e.type == SDL_QUIT) quit = true;
-
-			else if (e.type == SDL_KEYDOWN)
-			{
-				switch (e.key.keysym.sym)
-				{
-					case SDLK_UP:
-					{
-						if (debuggingSDL) printf("\nUp key pressed!\n");
-						break;
-					}
-					case SDLK_DOWN:
-					{
-						if (debuggingSDL) printf("\nDown key pressed!\n");
-						break;
-					}
-					case SDLK_LEFT:
-					{
-						if (debuggingSDL) printf("\nLeft key pressed!\n");
-						break;
-					}
-					case SDLK_RIGHT:
-					{
-						if (debuggingSDL) printf("\nRight key pressed!\n");
-						break;
-					}
-					case SDLK_ESCAPE:
-					{
-						quit = true;
-						break;
-					}
-					default: break;
-				}
-			}
-		}
-		mainWindow->updateTextureDisplay();
-	}
 
 	romFile.close();
 	logFile.close();
-
-	
-	mainWindow->closeSDL();
-	delete mainWindow;
-	
-
 	return 0;
 }
